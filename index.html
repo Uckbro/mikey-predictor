@@ -1,59 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mikey Predictor</title>
+  <title>Next Number Predictor</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 40px; }
-    input { margin: 8px; padding: 10px; font-size: 16px; width: 60px; text-align: center; }
-    button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
-    #result, #details { margin-top: 20px; font-size: 18px; }
-    .box { margin-top: 10px; }
+    body { font-family: Arial; padding: 20px; background: #f4f4f4; }
+    input, button { padding: 10px; margin: 5px; font-size: 16px; }
+    #result { margin-top: 20px; font-weight: bold; }
   </style>
 </head>
 <body>
-  <h1>Mikey Predictor</h1>
-  <p>Enter the last 4 result numbers (0–9):</p>
-  
-  <div class="box">
-    <input type="number" id="n1" min="0" max="9">
-    <input type="number" id="n2" min="0" max="9">
-    <input type="number" id="n3" min="0" max="9">
-    <input type="number" id="n4" min="0" max="9">
-  </div>
-
+  <h2>Next Number Predictor (0-9)</h2>
+  <p>Enter last 4 numbers (0-9):</p>
+  <input type="number" id="n1" min="0" max="9" required>
+  <input type="number" id="n2" min="0" max="9" required>
+  <input type="number" id="n3" min="0" max="9" required>
+  <input type="number" id="n4" min="0" max="9" required>
   <br>
-  <button onclick="predict()">Predict</button>
+  <button onclick="predict()">Predict Next</button>
 
-  <div id="details"></div>
   <div id="result"></div>
 
   <script>
     function predict() {
-      const inputs = [
+      const nums = [
         parseInt(document.getElementById("n1").value),
         parseInt(document.getElementById("n2").value),
         parseInt(document.getElementById("n3").value),
         parseInt(document.getElementById("n4").value)
       ];
-
-      if (inputs.some(isNaN)) {
+      
+      if (nums.some(isNaN)) {
         document.getElementById("result").innerText = "Please enter all 4 numbers.";
-        document.getElementById("details").innerText = "";
         return;
       }
 
-      // Show Big/Small label for each number
-      const labels = inputs.map(n => `${n} = ${n >= 5 ? 'Big' : 'Small'}`).join(" | ");
-      document.getElementById("details").innerText = "Last 4 results: " + labels;
+      // Simple average-based prediction
+      let avg = Math.round(nums.reduce((a, b) => a + b, 0) / 4);
+      if (avg > 9) avg = 9;
+      if (avg < 0) avg = 0;
 
-      // Calculate average and predict
-      const avg = inputs.reduce((a, b) => a + b, 0) / inputs.length;
-      const prediction = avg >= 5 ? "Big" : "Small";
-      document.getElementById("result").innerText = `Next likely: ${prediction}`;
+      const label = avg >= 5 ? "Big" : "Small";
+
+      document.getElementById("result").innerText = `Predicted Number: ${avg} (${label})`;
     }
   </script>
 </body>
-  </html>
-  
+</html>
