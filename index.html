@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mikey Predictor</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 40px; }
+    input { margin: 8px; padding: 10px; font-size: 16px; width: 60px; text-align: center; }
+    button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    #result { margin-top: 20px; font-size: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Mikey Predictor</h1>
+  <p>Enter the last 4 numbers:</p>
+  <input type="number" id="n1" min="0" max="9">
+  <input type="number" id="n2" min="0" max="9">
+  <input type="number" id="n3" min="0" max="9">
+  <input type="number" id="n4" min="0" max="9">
+  <br><br>
+  <button onclick="predict()">Predict</button>
+  <div id="result"></div>
+
+  <script>
+    function predict() {
+      const nums = [
+        parseInt(document.getElementById("n1").value),
+        parseInt(document.getElementById("n2").value),
+        parseInt(document.getElementById("n3").value),
+        parseInt(document.getElementById("n4").value)
+      ];
+
+      if (nums.some(isNaN)) {
+        document.getElementById("result").innerText = "Please enter all 4 numbers.";
+        return;
+      }
+
+      const avg = nums.reduce((a, b) => a + b, 0) / nums.length;
+      const prediction = avg >= 5 ? "Big" : "Small";
+
+      document.getElementById("result").innerText = `Next likely: ${prediction}`;
+    }
+  </script>
+</body>
+</html>
