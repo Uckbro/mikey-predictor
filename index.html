@@ -8,37 +8,49 @@
     body { font-family: Arial, sans-serif; text-align: center; padding: 40px; }
     input { margin: 8px; padding: 10px; font-size: 16px; width: 60px; text-align: center; }
     button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
-    #result { margin-top: 20px; font-size: 20px; font-weight: bold; }
+    #result, #details { margin-top: 20px; font-size: 18px; }
+    .box { margin-top: 10px; }
   </style>
 </head>
 <body>
   <h1>Mikey Predictor</h1>
-  <p>Enter the last 4 numbers:</p>
-  <input type="number" id="n1" min="0" max="9">
-  <input type="number" id="n2" min="0" max="9">
-  <input type="number" id="n3" min="0" max="9">
-  <input type="number" id="n4" min="0" max="9">
-  <br><br>
+  <p>Enter the last 4 result numbers (0–9):</p>
+  
+  <div class="box">
+    <input type="number" id="n1" min="0" max="9">
+    <input type="number" id="n2" min="0" max="9">
+    <input type="number" id="n3" min="0" max="9">
+    <input type="number" id="n4" min="0" max="9">
+  </div>
+
+  <br>
   <button onclick="predict()">Predict</button>
+
+  <div id="details"></div>
   <div id="result"></div>
 
   <script>
     function predict() {
-      const nums = [
+      const inputs = [
         parseInt(document.getElementById("n1").value),
         parseInt(document.getElementById("n2").value),
         parseInt(document.getElementById("n3").value),
         parseInt(document.getElementById("n4").value)
       ];
 
-      if (nums.some(isNaN)) {
+      if (inputs.some(isNaN)) {
         document.getElementById("result").innerText = "Please enter all 4 numbers.";
+        document.getElementById("details").innerText = "";
         return;
       }
 
-      const avg = nums.reduce((a, b) => a + b, 0) / nums.length;
-      const prediction = avg >= 5 ? "Big" : "Small";
+      // Show Big/Small label for each number
+      const labels = inputs.map(n => `${n} = ${n >= 5 ? 'Big' : 'Small'}`).join(" | ");
+      document.getElementById("details").innerText = "Last 4 results: " + labels;
 
+      // Calculate average and predict
+      const avg = inputs.reduce((a, b) => a + b, 0) / inputs.length;
+      const prediction = avg >= 5 ? "Big" : "Small";
       document.getElementById("result").innerText = `Next likely: ${prediction}`;
     }
   </script>
