@@ -1,48 +1,95 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Next Number Predictor</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mikey Predicted 2.0</title>
   <style>
-    body { font-family: Arial; padding: 20px; background: #f4f4f4; }
-    input, button { padding: 10px; margin: 5px; font-size: 16px; }
-    #result { margin-top: 20px; font-weight: bold; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      text-align: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    input {
+      width: 50px;
+      padding: 10px;
+      margin: 5px;
+      font-size: 18px;
+      text-align: center;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .result {
+      margin-top: 20px;
+      font-size: 22px;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
-  <h2>Next Number Predictor (0-9)</h2>
-  <p>Enter last 4 numbers (0-9):</p>
-  <input type="number" id="n1" min="0" max="9" required>
-  <input type="number" id="n2" min="0" max="9" required>
-  <input type="number" id="n3" min="0" max="9" required>
-  <input type="number" id="n4" min="0" max="9" required>
-  <br>
-  <button onclick="predict()">Predict Next</button>
-
-  <div id="result"></div>
+  <div class="container">
+    <h2>Mikey Predicted 2.0</h2>
+    <p>Enter last 4 results (0-9):</p>
+    <input type="number" id="n1" min="0" max="9" />
+    <input type="number" id="n2" min="0" max="9" />
+    <input type="number" id="n3" min="0" max="9" />
+    <input type="number" id="n4" min="0" max="9" />
+    <br />
+    <button onclick="predictNext()">Predict</button>
+    <div class="result" id="result"></div>
+  </div>
 
   <script>
-    function predict() {
-      const nums = [
-        parseInt(document.getElementById("n1").value),
-        parseInt(document.getElementById("n2").value),
-        parseInt(document.getElementById("n3").value),
-        parseInt(document.getElementById("n4").value)
-      ];
-      
-      if (nums.some(isNaN)) {
-        document.getElementById("result").innerText = "Please enter all 4 numbers.";
+    function predictNext() {
+      let n1 = parseInt(document.getElementById('n1').value);
+      let n2 = parseInt(document.getElementById('n2').value);
+      let n3 = parseInt(document.getElementById('n3').value);
+      let n4 = parseInt(document.getElementById('n4').value);
+
+      if ([n1, n2, n3, n4].some(isNaN)) {
+        document.getElementById('result').innerText = 'Please enter all 4 numbers.';
         return;
       }
 
-      // Simple average-based prediction
-      let avg = Math.round(nums.reduce((a, b) => a + b, 0) / 4);
-      if (avg > 9) avg = 9;
-      if (avg < 0) avg = 0;
+      // Average logic
+      let avg = Math.round((n1 + n2 + n3 + n4) / 4);
 
-      const label = avg >= 5 ? "Big" : "Small";
+      // Pattern logic (repeat most frequent)
+      let counts = {};
+      [n1, n2, n3, n4].forEach(n => counts[n] = (counts[n] || 0) + 1);
+      let freqNum = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
 
-      document.getElementById("result").innerText = `Predicted Number: ${avg} (${label})`;
+      // Random weighted logic
+      let weighted = Math.round((avg + parseInt(freqNum)) / 2);
+
+      let final = (weighted + Math.floor(Math.random() * 3) - 1) % 10;
+      if (final < 0) final += 10;
+
+      let size = final >= 5 ? 'Big' : 'Small';
+
+      document.getElementById('result').innerText = `Predicted Number: ${final} (${size})`;
     }
   </script>
 </body>
-</html>
+      </html>
+  
