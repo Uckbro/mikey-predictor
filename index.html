@@ -1,95 +1,55 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mikey Predicted 2.0</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
-      text-align: center;
-      padding: 20px;
-    }
-    .container {
-      max-width: 400px;
-      margin: 0 auto;
-      padding: 20px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    input {
-      width: 50px;
-      padding: 10px;
-      margin: 5px;
-      font-size: 18px;
-      text-align: center;
-    }
-    button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    .result {
-      margin-top: 20px;
-      font-size: 22px;
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h2>Mikey Predicted 2.0</h2>
-    <p>Enter last 4 results (0-9):</p>
-    <input type="number" id="n1" min="0" max="9" />
-    <input type="number" id="n2" min="0" max="9" />
-    <input type="number" id="n3" min="0" max="9" />
-    <input type="number" id="n4" min="0" max="9" />
-    <br />
-    <button onclick="predictNext()">Predict</button>
-    <div class="result" id="result"></div>
-  </div>
+import random
 
-  <script>
-    function predictNext() {
-      let n1 = parseInt(document.getElementById('n1').value);
-      let n2 = parseInt(document.getElementById('n2').value);
-      let n3 = parseInt(document.getElementById('n3').value);
-      let n4 = parseInt(document.getElementById('n4').value);
+# Function to generate color prediction and track trends
+def generate_color_prediction(last_outcome=None):
+    colors = ['Red', 'Green', 'Violet']
+    
+    # If there's no previous outcome, randomly choose the first color
+    if last_outcome is None:
+        return random.choice(colors)
+    
+    # Trend-following logic: predict based on the last outcome
+    # In this example, we assume that the next outcome will follow the last
+    if last_outcome == 'Red':
+        prediction = 'Green'  # Predict Green after Red (example logic)
+    elif last_outcome == 'Green':
+        prediction = 'Violet'  # Predict Violet after Green (example logic)
+    else:
+        prediction = 'Red'  # Predict Red after Violet (example logic)
+    
+    return prediction
 
-      if ([n1, n2, n3, n4].some(isNaN)) {
-        document.getElementById('result').innerText = 'Please enter all 4 numbers.';
-        return;
-      }
+# Function to simulate a game with real-time predictions
+def color_prediction_game(rounds=20):
+    colors = ['Red', 'Green', 'Violet']
+    game_outcomes = []
+    predicted_outcomes = []
+    
+    last_outcome = None  # Initialize the first round with no prior outcome
+    
+    for round_num in range(1, rounds + 1):
+        # Simulate the actual outcome (random)
+        actual_outcome = random.choice(colors)
+        game_outcomes.append(actual_outcome)
+        
+        # Predict the outcome based on last round (or random for the first round)
+        prediction = generate_color_prediction(last_outcome)
+        predicted_outcomes.append(prediction)
+        
+        # Update the last outcome to match the actual result
+        last_outcome = actual_outcome
+        
+        # Display round results
+        print(f"Round {round_num}: Actual Outcome = {actual_outcome}, Predicted = {prediction}")
+    
+    return game_outcomes, predicted_outcomes
 
-      // Average logic
-      let avg = Math.round((n1 + n2 + n3 + n4) / 4);
+# Start the game simulation
+if __name__ == "__main__":
+    rounds = 20  # Set the number of rounds for prediction
+    game_outcomes, predicted_outcomes = color_prediction_game(rounds)
+    
+    print("\nGame Outcomes:", game_outcomes)
+    print("Predicted Outcomes:", predicted_outcomes)
 
-      // Pattern logic (repeat most frequent)
-      let counts = {};
-      [n1, n2, n3, n4].forEach(n => counts[n] = (counts[n] || 0) + 1);
-      let freqNum = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
-
-      // Random weighted logic
-      let weighted = Math.round((avg + parseInt(freqNum)) / 2);
-
-      let final = (weighted + Math.floor(Math.random() * 3) - 1) % 10;
-      if (final < 0) final += 10;
-
-      let size = final >= 5 ? 'Big' : 'Small';
-
-      document.getElementById('result').innerText = `Predicted Number: ${final} (${size})`;
-    }
-  </script>
-</body>
-      </html>
-  
+    
