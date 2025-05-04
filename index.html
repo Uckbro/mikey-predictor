@@ -1,55 +1,58 @@
-import random
+# Number analysis tool: Big or Small predictor
 
-# Function to generate color prediction and track trends
-def generate_color_prediction(last_outcome=None):
-    colors = ['Red', 'Green', 'Violet']
-    
-    # If there's no previous outcome, randomly choose the first color
-    if last_outcome is None:
-        return random.choice(colors)
-    
-    # Trend-following logic: predict based on the last outcome
-    # In this example, we assume that the next outcome will follow the last
-    if last_outcome == 'Red':
-        prediction = 'Green'  # Predict Green after Red (example logic)
-    elif last_outcome == 'Green':
-        prediction = 'Violet'  # Predict Violet after Green (example logic)
-    else:
-        prediction = 'Red'  # Predict Red after Violet (example logic)
-    
-    return prediction
+# Frequency data from the image (last 100 periods)
+frequency = {
+    0: 10,
+    1: 7,
+    2: 9,
+    3: 12,
+    4: 8,
+    5: 12,
+    6: 7,
+    7: 12,
+    8: 13,
+    9: 10
+}
 
-# Function to simulate a game with real-time predictions
-def color_prediction_game(rounds=20):
-    colors = ['Red', 'Green', 'Violet']
-    game_outcomes = []
-    predicted_outcomes = []
-    
-    last_outcome = None  # Initialize the first round with no prior outcome
-    
-    for round_num in range(1, rounds + 1):
-        # Simulate the actual outcome (random)
-        actual_outcome = random.choice(colors)
-        game_outcomes.append(actual_outcome)
-        
-        # Predict the outcome based on last round (or random for the first round)
-        prediction = generate_color_prediction(last_outcome)
-        predicted_outcomes.append(prediction)
-        
-        # Update the last outcome to match the actual result
-        last_outcome = actual_outcome
-        
-        # Display round results
-        print(f"Round {round_num}: Actual Outcome = {actual_outcome}, Predicted = {prediction}")
-    
-    return game_outcomes, predicted_outcomes
+# Missing data from the image
+missing = {
+    0: 5,
+    1: 11,
+    2: 7,
+    3: 9,
+    4: 2,
+    5: 19,
+    6: 1,
+    7: 13,
+    8: 0,
+    9: 10
+}
 
-# Start the game simulation
-if __name__ == "__main__":
-    rounds = 20  # Set the number of rounds for prediction
-    game_outcomes, predicted_outcomes = color_prediction_game(rounds)
-    
-    print("\nGame Outcomes:", game_outcomes)
-    print("Predicted Outcomes:", predicted_outcomes)
+# Categorize numbers
+small_numbers = [n for n in range(0, 5)]
+big_numbers = [n for n in range(5, 10)]
 
-    
+# Calculate totals
+total_small_freq = sum(frequency[n] for n in small_numbers)
+total_big_freq = sum(frequency[n] for n in big_numbers)
+
+total_small_missing = sum(missing[n] for n in small_numbers)
+total_big_missing = sum(missing[n] for n in big_numbers)
+
+print("=== Number Analysis Tool ===")
+print(f"Small numbers frequency (0–4): {total_small_freq}")
+print(f"Big numbers frequency (5–9): {total_big_freq}")
+print(f"Small numbers avg missing: {total_small_missing / len(small_numbers):.2f}")
+print(f"Big numbers avg missing: {total_big_missing / len(big_numbers):.2f}")
+
+# Suggestion logic
+if total_big_freq > total_small_freq:
+    print("Prediction: BIG number more likely next.")
+elif total_small_freq > total_big_freq:
+    print("Prediction: SMALL number more likely next.")
+else:
+    print("Prediction: Equal chance for big or small.")
+
+# Optional: Show which number has been missing the longest
+most_missing = max(missing, key=missing.get)
+print(f"Longest missing number: {most_missing} (Missing for {missing[most_missing]} draws)")
