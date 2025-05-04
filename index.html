@@ -1,58 +1,32 @@
-# Number analysis tool: Big or Small predictor
+import random
 
-# Frequency data from the image (last 100 periods)
-frequency = {
-    0: 10,
-    1: 7,
-    2: 9,
-    3: 12,
-    4: 8,
-    5: 12,
-    6: 7,
-    7: 12,
-    8: 13,
-    9: 10
-}
+def get_random_color():
+    return random.choice(['Red', 'Green', 'Violet'])
 
-# Missing data from the image
-missing = {
-    0: 5,
-    1: 11,
-    2: 7,
-    3: 9,
-    4: 2,
-    5: 19,
-    6: 1,
-    7: 13,
-    8: 0,
-    9: 10
-}
+def main():
+    print("=== Color Prediction Game ===")
+    print("Available colors: Red, Green, Violet")
+    score = 0
+    rounds = 10
 
-# Categorize numbers
-small_numbers = [n for n in range(0, 5)]
-big_numbers = [n for n in range(5, 10)]
+    for round_number in range(1, rounds + 1):
+        print(f"\nRound {round_number}")
+        user_guess = input("Predict the next color: ").capitalize()
+        
+        if user_guess not in ['Red', 'Green', 'Violet']:
+            print("Invalid input. Please choose Red, Green, or Violet.")
+            continue
 
-# Calculate totals
-total_small_freq = sum(frequency[n] for n in small_numbers)
-total_big_freq = sum(frequency[n] for n in big_numbers)
+        actual_color = get_random_color()
+        print(f"Actual color: {actual_color}")
+        
+        if user_guess == actual_color:
+            print("Correct prediction! +1 point")
+            score += 1
+        else:
+            print("Wrong prediction. No point.")
+    
+    print(f"\nGame Over! Your total score: {score}/{rounds}")
 
-total_small_missing = sum(missing[n] for n in small_numbers)
-total_big_missing = sum(missing[n] for n in big_numbers)
-
-print("=== Number Analysis Tool ===")
-print(f"Small numbers frequency (0–4): {total_small_freq}")
-print(f"Big numbers frequency (5–9): {total_big_freq}")
-print(f"Small numbers avg missing: {total_small_missing / len(small_numbers):.2f}")
-print(f"Big numbers avg missing: {total_big_missing / len(big_numbers):.2f}")
-
-# Suggestion logic
-if total_big_freq > total_small_freq:
-    print("Prediction: BIG number more likely next.")
-elif total_small_freq > total_big_freq:
-    print("Prediction: SMALL number more likely next.")
-else:
-    print("Prediction: Equal chance for big or small.")
-
-# Optional: Show which number has been missing the longest
-most_missing = max(missing, key=missing.get)
-print(f"Longest missing number: {most_missing} (Missing for {missing[most_missing]} draws)")
+if __name__ == "__main__":
+    main()
