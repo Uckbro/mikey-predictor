@@ -1,29 +1,90 @@
-const getNextPrediction = (history) => {
-  if (history.length === 0) return 'Green';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Color 51 Pattern Detector</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6 text-gray-800">
 
-  const weights = { Red: 0, Green: 0, Violet: 0 };
+  <div class="max-w-xl mx-auto bg-white shadow-lg rounded-2xl p-6">
+    <h1 class="text-2xl font-bold mb-4 text-center">🎨 Color 51 Pattern Detector</h1>
+    
+    <label class="block mb-2 font-semibold">Enter recent results (comma-separated):</label>
+    <textarea id="colorInput" rows="3" class="w-full p-2 border rounded mb-4" placeholder="e.g. Red, Green, Red, Green, Violet"></textarea>
+    
+    <button onclick="analyze()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full">Detect Patterns</button>
+    
+    <div id="results" class="mt-6 space-y-2"></div>
+  </div>
 
-  // 1. Weighted frequency (recent = more weight)
-  for (let i = 0; i < history.length; i++) {
-    const color = history[history.length - 1 - i];
-    const weight = 1 / (i + 1); // Recent = heavier weight
-    weights[color] += weight;
-  }
+  <script>
+    function analyze() {
+      const input = document.getElementById("colorInput").value;
+      const colors = input.split(',').map(c => c.trim().charAt(0).toUpperCase() + c.trim().slice(1).toLowerCase());
+      const results = [];
 
-  // 2. Detect streaks
-  const lastColor = history[history.length - 1];
-  const streakLength = [...history].reverse().findIndex(c => c !== lastColor);
-  if (streakLength >= 2) {
-    // Reverse streak (if too long)
-    for (let color in weights) {
-      if (color !== lastColor) weights[color] += 1.5;
+      if (colors.length < 3) {
+        results.push("❌ Not enough data.");
+      } else {
+        // Alternating Pattern
+        if (colors.every((c, i) => i === 0 || c !== colors[i - 1])) {
+          results.push("✅ Alternating Pattern Detected");
+        }
+
+        // Repeating Colors
+        let count = 1;
+        for (let i = 1; i < colors.length; i++) {
+          if (colors[i] === colors[i - 1]) {
+            count++;
+          } else {
+            if (count >= 3) {
+              results.push(`🔁 Repeating ${colors[i - 1]} (${count}x)`);
+            }
+            count = 1;
+          }
+        }
+        if (count >= 3) {
+          results.push(`🔁 Repeating ${colors[colors.length - 1]} (${count}x)`);
+        }
+
+        // Violet Trigger
+        for (let i = 2; i < colors.length; i++) {
+          if (colors[i] === "Violet" && colors[i - 1] !== colors[i - 2]) {
+            results.push(`🎯 Violet Trigger Detected at position ${i + 1}`);
+          }
+        }
+
+        // 1-2 or 2-1 Pattern
+        let streaks = [];
+        count = 1;
+        for (let i = 1; i < colors.length; i++) {
+          if (colors[i] === colors[i - 1]) {
+            count++;
+          } else {
+            streaks.push(count);
+            count = 1;
+          }
+        }
+        streaks.push(count);
+        if (JSON.stringify(streaks.slice(-3)) === JSON.stringify([1,2,1]) ||
+            JSON.stringify(streaks.slice(-3)) === JSON.stringify([2,1,2])) {
+          results.push("📈 1-2 or 2-1 Pattern Detected");
+        }
+
+        // Sandwich Pattern
+        for (let i = 0; i < colors.length - 2; i++) {
+          if (colors[i] === colors[i + 2] && colors[i] !== colors[i + 1]) {
+            results.push(`🥪 Sandwich Pattern: ${colors[i]}-${colors[i + 1]}-${colors[i]} at position ${i + 1}`);
+          }
+        }
+      }
+
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = results.length ? 
+        results.map(r => `<div class="p-2 bg-green-100 rounded">${r}</div>`).join("") :
+        `<div class="p-2 bg-yellow-100 rounded">No strong pattern detected.</div>`;
     }
-  } else {
-    // Encourage streak continuation
-    weights[lastColor] += 1;
-  }
-
-  // 3. Normalize and pick highest score
-  const sorted = Object.entries(weights).sort((a, b) => b[1] - a[1]);
-  return sorted[0][0];
-};
+  </script>
+</body>
+  </html>
