@@ -1,60 +1,113 @@
-from collections import Counter
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Number Predictor - Color 51</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background: #f3f3f3;
+    }
+    h2 {
+      color: #444;
+    }
+    input {
+      width: 80%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    pre {
+      background: #fff;
+      padding: 15px;
+      margin-top: 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h2>🔮 Number Predictor for Color 51</h2>
+  <p>Enter past numbers separated by commas (e.g. <code>2,3,4,7,2,2,5,2</code>)</p>
+  <input type="text" id="input" placeholder="Enter past results here..." />
+  <br />
+  <button onclick="runPrediction()">Predict</button>
 
-def predict_next_number(history):
-    if not history or len(history) < 5:
-        return "Not enough data to predict."
+  <pre id="result"></pre>
 
-    # 1. Frequency Analysis (last 10 numbers)
-    recent = history[-10:]
-    freq = Counter(recent)
-    most_common = freq.most_common()
+  <script>
+    function predictNextNumber(history) {
+      if (!history || history.length < 5) {
+        return { error: "❌ Not enough data to predict. Enter at least 5 numbers." };
+      }
 
-    # 2. Transition Prediction (last 2 to 3 patterns)
-    transitions = {}
-    for i in range(len(history) - 1):
-        pair = (history[i], history[i + 1])
-        transitions[pair] = transitions.get(pair, 0) + 1
+      // Frequency analysis
+      let recent = history.slice(-10);
+      let freq = {};
+      for (let num of recent) {
+        freq[num] = (freq[num] || 0) + 1;
+      }
 
-    last_number = history[-1]
-    likely_next = []
+      let sortedFreq = Object.entries(freq).sort((a, b) => b[1] - a[1]);
+      let topCommon = parseInt(sortedFreq[0][0]);
 
-    # Find most frequent number following the last number
-    for (a, b), count in transitions.items():
-        if a == last_number:
-            likely_next.append((b, count))
+      // Transition map
+      let transitions = {};
+      for (let i = 0; i < history.length - 1; i++) {
+        let from = history[i];
+        let to = history[i + 1];
+        let key = from + "-" + to;
+        transitions[key] = (transitions[key] || 0) + 1;
+      }
 
-    likely_next.sort(key=lambda x: -x[1])  # highest count first
+      let last = history[history.length - 1];
+      let likelyNext = [];
+      for (let key in transitions) {
+        if (key.startsWith(last + "-")) {
+          let next = parseInt(key.split("-")[1]);
+          likelyNext.push([next, transitions[key]]);
+        }
+      }
 
-    # 3. Combine: Top candidates
-    candidates = []
-    if likely_next:
-        top_likely = likely_next[0][0]
-        candidates.append(top_likely)
+      likelyNext.sort((a, b) => b[1] - a[1]);
 
-    if most_common:
-        top_common = most_common[0][0]
-        if top_common not in candidates:
-            candidates.append(top_common)
+      let prediction = likelyNext.length > 0 ? likelyNext[0][0] : topCommon;
+      let predictions = [prediction];
 
-    # 4. Fallback: Most recent pattern repetition
-    if len(set(recent)) <= 3:
-        # Only 2–3 unique numbers repeating
-        candidates.append(recent[-2])  # may repeat again
+      if (!predictions.includes(topCommon)) predictions.push(topCommon);
+      if (new Set(recent).size <= 3) predictions.push(recent[recent.length - 2]);
 
-    # Ensure unique candidates
-    final_prediction = list(dict.fromkeys(candidates))[:3]
+      predictions = [...new Set(predictions)].slice(0, 3);
 
-    return {
-        "predicted_number": final_prediction[0],
-        "confidence": "high" if len(final_prediction) == 1 else "medium",
-        "top_3_predictions": final_prediction
+      return {
+        predicted_number: predictions[0],
+        confidence: predictions.length === 1 ? "high" : "medium",
+        top_3_predictions: predictions
+      };
     }
 
-# Example usage
-past_results = [3, 4, 7, 2, 2, 5, 2, 7, 3, 2, 7, 3, 2]
-result = predict_next_number(past_results)
+    function runPrediction() {
+      const raw = document.getElementById("input").value;
+      const numbers = raw.split(",").map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+      const result = predictNextNumber(numbers);
 
-print("🔮 Prediction Result:")
-print("➡️ Likely next number:", result['predicted_number'])
-print("📊 Top 3 candidates:", result['top_3_predictions'])
-print("🔒 Confidence level:", result['confidence'])
+      const display = document.getElementById("result");
+      if (result.error) {
+        display.textContent = result.error;
+      } else {
+        display.innerHTML = `🔮 Predicted Number: ${result.predicted_number}\n📊 Top 3 Predictions: ${result.top_3_predictions.join(", ")}\n🔒 Confidence: ${result.confidence}`;
+      }
+    }
+  </script>
+</body>
+    </html>
