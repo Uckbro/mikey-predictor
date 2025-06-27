@@ -2,112 +2,113 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Number Predictor - Color 51</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 30px;
-      background: #f3f3f3;
-    }
-    h2 {
-      color: #444;
-    }
-    input {
-      width: 80%;
-      padding: 10px;
-      font-size: 16px;
-      margin-bottom: 10px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      background: #007bff;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    pre {
-      background: #fff;
-      padding: 15px;
-      margin-top: 15px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-  </style>
-</head>
-<body>
-  <h2>🔮 Number Predictor for Color 51</h2>
-  <p>Enter past numbers separated by commas (e.g. <code>2,3,4,7,2,2,5,2</code>)</p>
-  <input type="text" id="input" placeholder="Enter past results here..." />
-  <br />
-  <button onclick="runPrediction()">Predict</button>
-
-  <pre id="result"></pre>
-
+    <title>51Game2 B/S Pattern Predictor</title>
+      <style>
+          body {
+                font-family: Arial, sans-serif;
+                      background: #f9f9f9;
+                            padding: 30px;
+                                  max-width: 500px;
+                                        margin: auto;
+                                            }
+                                                h2 { text-align: center; }
+                                                    button {
+                                                          padding: 12px 20px;
+                                                                margin: 5px;
+                                                                      font-size: 16px;
+                                                                            cursor: pointer;
+                                                                                  border: none;
+                                                                                        border-radius: 6px;
+                                                                                            }
+                                                                                                .win { background: #28a745; color: white; }
+                                                                                                    .lose { background: #dc3545; color: white; }
+                                                                                                        .reset { background: #007bff; color: white; }
+                                                                                                            .card {
+                                                                                                                  background: white;
+                                                                                                                        border-radius: 10px;
+                                                                                                                              padding: 20px;
+                                                                                                                                    margin-top: 20px;
+                                                                                                                                          box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                                                                                                                                              }
+                                                                                                                                                  .label { font-weight: bold; }
+                                                                                                                                                    </style>
+                                                                                                                                                    </head>
+                                                                                                                                                    <body>
+  <h2>🔢 51Game2 B/S Doubling Tool</h2>
+  <div class="card">
+      <div><span class="label">Next Prediction:</span> <span id="prediction">Small</span></div>
+          <div><span class="label">Bet Amount:</span> ₹<span id="betAmount">10</span></div>
+              <div><span class="label">Profit:</span> ₹<span id="profit">0</span></div>
+                </div>
+  <div style="text-align: center; margin-top: 20px;">
+      <button class="win" onclick="handleResult(true)">✅ Win</button>
+          <button class="lose" onclick="handleResult(false)">❌ Lose</button>
+              <button class="reset" onclick="resetAll()">🔄 Reset</button>
+                </div>
+  <div class="card">
+      <label>🔁 Enter Last 10 Results (B/S):</label>
+          <input type="text" id="bsInput" placeholder="e.g. S,S,B,B,S,B,S,B,B,S" style="width:100%;padding:10px;" />
+              <button onclick="analyzeBS()" style="margin-top:10px;width:100%;">🔍 Predict From Pattern</button>
+                  <div id="bsResult" style="margin-top:10px;color:#333;"></div>
+                    </div>
   <script>
-    function predictNextNumber(history) {
-      if (!history || history.length < 5) {
-        return { error: "❌ Not enough data to predict. Enter at least 5 numbers." };
-      }
-
-      // Frequency analysis
-      let recent = history.slice(-10);
-      let freq = {};
-      for (let num of recent) {
-        freq[num] = (freq[num] || 0) + 1;
-      }
-
-      let sortedFreq = Object.entries(freq).sort((a, b) => b[1] - a[1]);
-      let topCommon = parseInt(sortedFreq[0][0]);
-
-      // Transition map
-      let transitions = {};
-      for (let i = 0; i < history.length - 1; i++) {
-        let from = history[i];
-        let to = history[i + 1];
-        let key = from + "-" + to;
-        transitions[key] = (transitions[key] || 0) + 1;
-      }
-
-      let last = history[history.length - 1];
-      let likelyNext = [];
-      for (let key in transitions) {
-        if (key.startsWith(last + "-")) {
-          let next = parseInt(key.split("-")[1]);
-          likelyNext.push([next, transitions[key]]);
-        }
-      }
-
-      likelyNext.sort((a, b) => b[1] - a[1]);
-
-      let prediction = likelyNext.length > 0 ? likelyNext[0][0] : topCommon;
-      let predictions = [prediction];
-
-      if (!predictions.includes(topCommon)) predictions.push(topCommon);
-      if (new Set(recent).size <= 3) predictions.push(recent[recent.length - 2]);
-
-      predictions = [...new Set(predictions)].slice(0, 3);
-
-      return {
-        predicted_number: predictions[0],
-        confidence: predictions.length === 1 ? "high" : "medium",
-        top_3_predictions: predictions
-      };
-    }
-
-    function runPrediction() {
-      const raw = document.getElementById("input").value;
-      const numbers = raw.split(",").map(n => parseInt(n.trim())).filter(n => !isNaN(n));
-      const result = predictNextNumber(numbers);
-
-      const display = document.getElementById("result");
-      if (result.error) {
-        display.textContent = result.error;
-      } else {
-        display.innerHTML = `🔮 Predicted Number: ${result.predicted_number}\n📊 Top 3 Predictions: ${result.top_3_predictions.join(", ")}\n🔒 Confidence: ${result.confidence}`;
-      }
-    }
-  </script>
+      let startingBet = 10;
+          let bet = startingBet;
+              let lossStreak = 0;
+                  let profit = 0;
+                      let currentPrediction = "Small";
+    function updateDisplay() {
+          document.getElementById("betAmount").textContent = bet;
+                document.getElementById("profit").textContent = profit;
+                      document.getElementById("prediction").textContent = currentPrediction;
+                          }
+    function handleResult(won) {
+          if (won) {
+                  profit += bet;
+                          bet = startingBet;
+                                  lossStreak = 0;
+                                          currentPrediction = currentPrediction === "Small" ? "Big" : "Small";
+                                                } else {
+                                                        profit -= bet;
+                                                                lossStreak += 1;
+                                                                        bet = bet * 2;
+                                                                                if (lossStreak >= 2) {
+                                                                                          bet = startingBet;
+                                                                                                    lossStreak = 0;
+                                                                                                              currentPrediction = currentPrediction === "Small" ? "Big" : "Small";
+                                                                                                                      }
+                                                                                                                            }
+                                                                                                                                  updateDisplay();
+                                                                                                                                      }
+    function resetAll() {
+          bet = startingBet;
+                lossStreak = 0;
+                      profit = 0;
+                            currentPrediction = "Small";
+                                  updateDisplay();
+                                        document.getElementById("bsResult").innerHTML = "";
+                                            }
+    function analyzeBS() {
+          const input = document.getElementById("bsInput").value.trim().toUpperCase();
+                const parts = input.split(',').map(p => p.trim()).filter(p => p === 'B' || p === 'S');
+      if (parts.length !== 10) {
+              alert("Please enter exactly 10 values using only B and S.");
+                      return;
+                            }
+      let bCount = parts.filter(x => x === 'B').length;
+            let sCount = parts.filter(x => x === 'S').length;
+      let prediction = bCount > sCount ? "Small" : "Big";
+            let confidence = Math.abs(bCount - sCount) >= 4 ? "High" :
+                                   Math.abs(bCount - sCount) >= 2 ? "Medium" : "Low";
+      currentPrediction = prediction;
+            updateDisplay();
+      document.getElementById("bsResult").innerHTML = `
+              🔮 <strong>Predicted:</strong> ${prediction}<br>
+                      📊 <strong>Confidence:</strong> ${confidence}<br>
+                              B: ${bCount} | S: ${sCount}
+                                    `;
+                                        }
+    updateDisplay();
+      </script>
 </body>
-    </html>
+</html>
